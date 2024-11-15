@@ -1,15 +1,23 @@
-# Используем базовый образ Python
-FROM python:3.9-slim
+# For more information, please refer to https://aka.ms/vscode-docker-python
+FROM python:3-slim
 
-# Устанавливаем рабочую директорию внутри контейнера
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED=1
+
+# Install pip requirements
+COPY requirements.txt .
+RUN python -m pip install -r requirements.txt
+
 WORKDIR /app
+COPY . /app
 
-# Копируем файл с ботом и зависимости в контейнер
-COPY telegram_bot.py /app/telegram_bot.py
-COPY requirements.txt /app/requirements.txt
+# Creates a non-root user with an explicit UID and adds permission to access the /app folder
+# For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers
+RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
 
-# Устанавливаем зависимости
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Указываем команду запуска бота
-CMD ["python3", "telegram_bot.py"]
+# During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
+CMD ["python", "telegram_bot.py"]

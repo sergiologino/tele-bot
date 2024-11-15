@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  telebot:
+    image: telebot
+    build:
+      context: .
+      dockerfile: ./Dockerfile
